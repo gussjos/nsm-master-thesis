@@ -1,0 +1,2 @@
+Measurement containing surface bound particle:
+/nsm-results/ferritin/2020-10-13-ferritin/ferritin/channel_17_30x85 folder
