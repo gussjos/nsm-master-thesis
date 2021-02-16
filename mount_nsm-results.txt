@@ -1,0 +1,1 @@
+sudo mount -t cifs //sol.ita.chalmers.se/groups/nsm-results /mnt -o user=gussjos,uid=1000,gid=1000

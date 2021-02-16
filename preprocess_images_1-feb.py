@@ -51,26 +51,37 @@ def diffusion_preprocess(A,downscaling_factor):
 downscaling_factor = 4
 save_imgs = 1
 
-img_path = '/home/gustaf/nsm data/7.5e-5/'
-save_path_intensity = '/home/gustaf/nsm data/7.5e-4 preprocessed for intensity/'
-save_path_diffusion = '/home/gustaf/nsm data/7.5e-4 preprocessed for diffusion/'
+main_load_path = '/home/gustaf/nsm_data/experimental_data/'
+folder = 'ferritin/2020-10-13-ferritin/ferritin/channel_17_30x85/'
+load_path = main_load_path + folder
+
+
+img_path = '/home/gustaf/nsm_data/experimental data/'
+
+main_save_path = '/home/gustaf/nsm_data/preprocessed_experimental_data/'
+save_path = main_save_path + folder
 
 try:
-    os.mkdir(save_path_intensity)
+   os.makedirs(save_path + '/diffusion/', exist_ok=True)
 except:
+    print()
     print('Directory already exists.')
 try:
-    os.mkdir(save_path_diffusion)
+   os.makedirs(save_path + '/intensity/', exist_ok=True)
 except:
     print('Directory already exists.')
 
-files = os.listdir(img_path)
-for file in tqdm.tqdm(files):
-    ExpData = IO.loadmat(img_path + file)
+files = os.listdir(load_path)
+
+for filename in tqdm.tqdm(files):
+    print(filename)
+    if os.path.isfile(save_path+ '/diffusion/' + filename):
+        continue
+    ExpData = IO.loadmat(load_path + filename)
     data = ExpData["data"]["Im"][0][0]
     
     Bsm_D,a = diffusion_preprocess(data,downscaling_factor)
-    Bsm_iOC = intensity_preprocess(data)
+    #Bsm_iOC = intensity_preprocess(data)
         
     # Plot diffusion img
     plt.figure(figsize=(16,2))
@@ -80,13 +91,13 @@ for file in tqdm.tqdm(files):
     plt.show()
         
     # Plot intensity img
-    plt.figure(figsize=(16,2))
-    i1 = 256
-    plt.imshow(Bsm_iOC.T[:,i1:1024+i1],aspect='auto')
-    plt.colorbar()
-    plt.show()
+    #plt.figure(figsize=(16,2))
+    #i1 = 256
+    #plt.imshow(Bsm_iOC.T[:,i1:1024+i1],aspect='auto')
+    #plt.colorbar()
+    #plt.show()
     
     if save_imgs:
-        np.save(save_path_diffusion + file, Bsm_D)
-        np.save(save_path_intensity + file, Bsm_iOC)
-        print('Files saved.')
+        np.save(save_path + '/diffusion/' + filename, Bsm_D)
+        #np.save(save_path + '/intensity/' + filename, Bsm_iOC)
+        print(' Files saved.')
