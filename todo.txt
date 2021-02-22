@@ -1,7 +1,20 @@
 Feb 11:
-1. (iOC/D-predictions): Make predictions proportional to the size of the image predicted on (N)
-2. (Stitching): Add gap tolerance 
-3. (Predictions): Create subplots for both datasets
-4. (Predictions): Calculate and save benchmarks
+X 1. (iOC/D-predictions): Make predictions proportional to the size of the image predicted on (N) X
+X 2. (Stitching): Add gap tolerance X
+X 3. (Predictions): Create subplots for both datasets X
+X 4. (Predictions): Calculate and save benchmarks X
 5. (Experimental) Download and preprocess all
-6. Test yolo on surface bound particle
+"X" 6. Test yolo on surface bound particle X (measurement was weird)
+
+Feb 17:
+X 1. Make new yolo boxes for mixed and unmixed data X
+2. Repredict intensities with stitches
+	2a. Mixed
+	2b. Unmixed
+3. Make new plots
+	3a. Mixed
+	3b. Unmixed
+
+4. Add to benchmarks document
+	3a. Mixed
+	3b. Unmixed
