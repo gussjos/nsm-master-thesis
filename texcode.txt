@@ -1,0 +1,1 @@
+\frac{\widehat {D}-D_\text{true}}{D_\text{true}} \text{ vs } iOC

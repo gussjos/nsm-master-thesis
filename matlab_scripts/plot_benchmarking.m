@@ -12,12 +12,15 @@ close all
 DD=[10,20,50];
 iiOC=[ 1e-4,2e-4,5e-4];
 figure
+path = '/home/gustaf/nsm_data/non mixed benchmarks barbora/collection_D'
+BasicColor = ["blue","red","green"]
+%/Volumes/nsm-results/simulated_tests/velocity0_distance20_timesteps10000/particle_tracking/collection_D
 for iD=1:3
     D=DD(iD);
      for iiiOC=1:3
          iOC=iiOC(iiiOC);
 
-            load(strcat('/Volumes/nsm-results/simulated_tests/velocity0_distance20_timesteps10000/particle_tracking/collection_D',num2str(D),'_OC',num2str(iOC),'_D11.mat'))
+            load(strcat(path,num2str(D),'_OC',num2str(iOC),'_D11.mat'))
               ff=find(collection.N>40);
               collectionF.N=collection.N(ff);
               collectionF.iOC_mean=collection.iOC_mean(ff);
@@ -38,13 +41,61 @@ ylabel('D (\mum^2/s)')
 
 return
 
-%% benchmarking_2 and benchmarking_3
+%% find means from fit
 
 clear;
+BasicColor = ["blue","red","green","yellow"]
 %close all
 
 DD=fliplr([10,20,50]);
-iiOC=[1e-4,2e-4,5e-4];
+iiOC=[0.75e-4,1e-4,2e-4,5e-4];
+iOC_lim=[-0.5e-4 5.5e-4];
+D_lim=[0 120];
+kk=0; figure
+for iD=1:3
+    D=DD(iD);
+     for iiiOC=1:4
+         iOC=iiOC(iiiOC);
+            path = '/home/gustaf/nsm_data/non mixed benchmarks barbora/collection_D'
+            filename = strcat(path,num2str(D),'_OC',num2str(iOC),'_D11.mat')
+            load(filename)
+              ff=find(collection.N>40);
+              collectionF.N=collection.N(ff);
+              collectionF.iOC_mean=collection.iOC_mean(ff);
+              collectionF.Deff_mean=collection.Deff_mean(ff);
+         
+         [iOC_edges, Deff_edges, iOC_edges2, Deff_edges2, iOC_hist, Deff_hist, iOCxDeff_hist] = weighted_histogram (collectionF,0.5e-5,0.5, 2, iOC_lim, D_lim);
+         
+
+         fitresult=fit(iOC_edges',iOC_hist','gauss1','TolFun',1e-9);
+         
+         iOC_mean(iiiOC,iD)=fitresult.b1;
+         iOC_std(iiiOC,iD)=fitresult.c1/sqrt(2);
+         
+         fitresult=fit(Deff_edges',Deff_hist','gauss1','TolFun',1e-9);
+         
+         Deff_mean(iiiOC,iD)=fitresult.b1;
+         Deff_std(iiiOC,iD)=fitresult.c1/sqrt(2);
+         
+     end
+end
+
+%% Save
+clc
+save('iOC_means_non-mixed_data_barbora','iOC_mean')
+save('iOC_stds_non-mixed_data_barbora','iOC_std')
+save('D_means_non-mixed_data_barbora','Deff_mean')
+save('D_stds_non-mixed_data_barbora','Deff_std')
+
+
+%% benchmarking_2 and benchmarking_3
+
+clear;
+BasicColor = ["blue","red","green"]
+%close all
+
+DD=fliplr([10,20,50]);
+iiOC=[0.75e-4,1e-4,2e-4,5e-4];
 iOC_lim=[-0.5e-4 5.5e-4];
 D_lim=[0 120];
 kk=0; figure
@@ -52,8 +103,9 @@ for iD=1:3
     D=DD(iD);
      for iiiOC=1:3
          iOC=iiOC(iiiOC);
-              
-            load(strcat('/Volumes/nsm-results/simulated_tests/velocity0_distance20_timesteps10000/particle_tracking/collection_D',num2str(D),'_OC',num2str(iOC),'_D11.mat'))
+            path = '/home/gustaf/nsm_data/non mixed benchmarks barbora/collection_D'
+            filename = strcat(path,num2str(D),'_OC',num2str(iOC),'_D11.mat')
+            load(filename)
               ff=find(collection.N>40);
               collectionF.N=collection.N(ff);
               collectionF.iOC_mean=collection.iOC_mean(ff);
@@ -90,6 +142,7 @@ for iD=1:3
      end
 end
 
+%% Plot
 
 figure1=figure;
 axes1 = axes('Parent',figure1,...
