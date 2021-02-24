@@ -13,6 +13,8 @@ DD=[10,20,50];
 iiOC=[ 1e-4,2e-4,5e-4];
 figure
 path = '/home/gustaf/nsm_data/non mixed benchmarks barbora/collection_D'
+path = '/home/gustaf/nsm_data/mixed benchmarks barbora/collection_D'
+
 BasicColor = ["blue","red","green"]
 %/Volumes/nsm-results/simulated_tests/velocity0_distance20_timesteps10000/particle_tracking/collection_D
 for iD=1:3
