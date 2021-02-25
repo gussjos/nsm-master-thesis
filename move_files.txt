@@ -1,0 +1,2 @@
+scp -r ferritin/2020-10-13-ferritin/ferritin/channel_17_30x85/*_M \
+~/nsm_data/experimental_data/ferritin/2020-10-13-ferritin/ferritin/channel_17_30x85/

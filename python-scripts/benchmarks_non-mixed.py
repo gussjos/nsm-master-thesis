@@ -33,7 +33,10 @@ D_stds = []
 fs = 18
 
 
-markers = ['d','o','s','^']
+markerss = ['d','o','s','^']
+markers = {}
+for j,iOC_str in enumerate(iOC_strs):
+    markers[iOC_str] = markerss[j]
 alphas = 4*[1]
 
 iOCs = np.array([0.75,1,2,5])
@@ -59,7 +62,7 @@ pred_dict = {'our_preds':preds,'barboras_preds':[]}
 for j, iOC_str in enumerate(iOC_strs):
     for k, D_str in enumerate(D_strs):
     
-        m = markers[k]
+        m = markers[iOC_str]
 
         iOC_mean = np.mean(preds[iOC_str][D_str]["iOC"])
         D_mean = np.mean(preds[iOC_str][D_str]["D"])
@@ -104,7 +107,7 @@ s2 = 27
 
 plt.subplot2grid((s1,s2), (0, 0), colspan=colspan,rowspan=rowspan)
 
-ms = 8
+ms = 6
 plot_grid = 1
 if plot_grid:
     a = 0.1
@@ -114,19 +117,20 @@ if plot_grid:
         plt.axhline(D,linestyle='--',alpha=a,color='black')
     
 for j,iOC in enumerate(iOCs):
+    iOC_str = iOC_strs[j]
     aa = 0.35
     for k,D in enumerate(Ds):
         J = j+k
         if J == 0:
-            plt.plot(np.array(1*[iOC]), D, marker=markers[j],color='grey',alpha=aa,label='Expected',markersize=ms)
+            plt.plot(np.array(1*[iOC]), D, marker=markers[iOC_str],color='grey',alpha=aa,label='Expected',markersize=ms)
         else:
-            plt.plot(np.array(1*[iOC]), D, marker=markers[j],color='grey',alpha=aa,markersize=ms)
+            plt.plot(np.array(1*[iOC]), D, marker=markers[iOC_str],color='grey',alpha=aa,markersize=ms)
         
 for jj, pred_str in enumerate(list(pred_dict.keys())):
     for j, iOC_str in enumerate(iOC_strs):
         alpha = alphas[j]
         
-        m = markers[j]
+        m = markers[iOC_str]
         for k, D_str in enumerate(D_strs):
             
             D_exp_val = Ds[k]#D_exp[i]
@@ -139,7 +143,7 @@ for jj, pred_str in enumerate(list(pred_dict.keys())):
                 D_mean = np.mean(pred_dict[pred_str][iOC_str][D_str]["D"])
                 iOC_std = np.std(pred_dict[pred_str][iOC_str][D_str]["iOC"])
                 D_std = np.std(pred_dict[pred_str][iOC_str][D_str]["D"])
-                c = 'blue'
+                c = 'tab:blue'
                 x_str = ' ANN'           
                 
             if pred_str == "barboras_preds":
@@ -149,7 +153,7 @@ for jj, pred_str in enumerate(list(pred_dict.keys())):
                 iOC_std = iOC_stds_barbora[D_str][j]*1e4
                 D_std = D_stds_barbora[iOC_str][k]
                 
-                c = 'red'
+                c = 'tab:red'
                 x_str = ' Barbora'              
                 
             f = 0.05
@@ -173,7 +177,7 @@ for jj, pred_str in enumerate(list(pred_dict.keys())):
     
 prev_col_idx = np.copy(colspan)
 
-#%% Plot mean(iOC) 
+#%% Plot mean(D) 
 prev_row_idx = -2
 col_idx = prev_col_idx + 1 #prev_col_idx +1
 colspan = 4
@@ -188,27 +192,30 @@ for j, iOC_str in enumerate(iOC_strs):
     prev_row_idx = row_idx + colspan
     for jj, pred_str in enumerate(list(pred_dict.keys())):
         if pred_str == 'our_preds':
-            c = 'blue'
+            c = 'tab:blue'
             Ds_y = (np.flip(D_means_ours[iOC_str])-Ds)/Ds
             if iOC == 5:
                 plt.plot(Ds,abs(Ds_y),color=c,alpha=alpha,label='iOC={:.0f}e-4 $\mu$m ANN'.format(iOC))
             else:
                 plt.plot(Ds,abs(Ds_y),color=c,alpha=alpha)
+            plt.scatter(Ds,abs(Ds_y),marker=markers[iOC_str],edgecolor='black',color=c)
                 
         else:
-            c = 'red'
+            c = 'tab:red'
             Ds_y = ((D_means_barbora[iOC_str])-Ds)/Ds
             if iOC == 5:
                 plt.plot(Ds,abs(Ds_y),color=c,alpha=alpha,label='iOC={:.0f}e-4 $\mu$m Barbora'.format(iOC))
             else:
                 plt.plot(Ds,abs(Ds_y),color=c,alpha=alpha)
+            plt.scatter(Ds,abs(Ds_y),marker=markers[iOC_str],edgecolor='black',color=c)
         if j==len(iOC_strs)-1:
-            plt.xlabel(r'D $(\mu$m$^2$/s)')
-        #plt.ylabel(r'$(D-D_{true})/D_{true}$')
-        plt.title('iOC: {:.2f}e-4'.format(iOC),fontsize=11,fontweight='bold')
+            plt.xlabel(r'$D$ $(\mu$m$^2$/s)')
+        if j==0:
+            plt.ylabel(r'$(\widehat{D}-D_{true})/D_{true}$')
+        plt.title('iOC: {:.2f}e-4'.format(iOC),fontsize=11)
         
 
-#%% Plot std(iOC) 
+#%% Plot std(D) 
 prev_col_idx = col_idx+colspan
 prev_row_idx = -2
 col_idx = prev_col_idx + 1
@@ -224,24 +231,27 @@ for j, iOC_str in enumerate(iOC_strs):
     alpha = 1
     for jj, pred_str in enumerate(list(pred_dict.keys())):
         if pred_str == 'our_preds':
-            c = 'blue'
+            c = 'tab:blue'
             if iOC == 5:
                 plt.plot(Ds,np.flip(D_stds_ours[iOC_str]),color=c,alpha=alpha,label='iOC={:.0f}e-4 $\mu$m ANN'.format(iOC))
             else:
                 plt.plot(Ds,np.flip(D_stds_ours[iOC_str]),color=c,alpha=alpha)
+            plt.scatter(Ds,np.flip(D_stds_ours[iOC_str]),marker=markers[iOC_str],edgecolor='black',color=c)
                 
         else:
-            c = 'red'
+            c = 'tab:red'
             if iOC == 5:
                 plt.plot(Ds,(D_stds_barbora[iOC_str]),color=c,alpha=alpha,label='iOC={:.0f}e-4 $\mu$m Barbora'.format(iOC))
             else:
                 plt.plot(Ds,(D_stds_barbora[iOC_str]),color=c,alpha=alpha)
+            plt.scatter(Ds,D_stds_barbora[iOC_str],marker=markers[iOC_str],edgecolor='black',color=c)
         if j==len(iOC_strs)-1:
-            plt.xlabel(r'D $(\mu$m$^2$/s)')
-        #plt.ylabel(r'$(D-D_{true})/D_{true}$')
-        plt.title('iOC: {:.2f}e-4'.format(iOC),fontsize=11,fontweight='bold')
+            plt.xlabel(r'$D$ $(\mu$m$^2$/s)')
+        if j==0:
+            plt.ylabel(r'std$(D)$ ($\mu$m$^2$/s)')
+        plt.title('iOC: {:.2f}e-4'.format(iOC),fontsize=11)
 
-#%% Plot mean(D)
+#%% Plot mean(iOC)
 prev_col_idx = col_idx+colspan
 prev_row_idx = -2
 col_idx = prev_col_idx + 1
@@ -257,27 +267,34 @@ for j, D_str in enumerate(D_strs):
     for jj, pred_str in enumerate(list(pred_dict.keys())):
         if pred_str == 'our_preds':
             iOCs_y = (iOC_means_ours[D_str]-iOCs)/iOCs
-            c = 'blue'
+            c = 'tab:blue'
+                
+                
             if D == 50:
                 plt.plot(iOCs,abs(iOCs_y),color=c,alpha=alpha,label='D={:.0f}$\mu$m$^2$/s ANN'.format(D))
             else:
                 plt.plot(iOCs,abs(iOCs_y),color=c,alpha=alpha)
+            for jk,iOC_str in enumerate(iOC_strs):
+                plt.plot(iOCs[jk],abs(iOCs_y)[jk],marker=markers[iOC_str],markeredgecolor='black',color=c)
         else:
             iOCs_y = (1e4*iOC_means_barbora[D_str]-iOCs)/iOCs
-            c = 'red'
+            c = 'tab:red'
             if D == 50:
                 plt.plot(iOCs,abs(iOCs_y),color=c,alpha=alpha,label='D={:.0f}$\mu$m$^2$/s Barbora'.format(D))
             else:
                 plt.plot(iOCs,abs(iOCs_y),color=c,alpha=alpha)
+            for jk,iOC_str in enumerate(iOC_strs):
+                plt.plot(iOCs[jk],abs(iOCs_y)[jk],marker=markers[iOC_str],markeredgecolor='black',color=c)
                 
-        #plt.ylabel(r'(iOC-iOC$_{true})/$iOC$_{true}$')
         if j==len(D_strs)-1:
             plt.xlabel(r'iOC (1e-4$\mu$m)')
-    plt.title('D: {:.0f}'.format(D),fontweight='bold')
+        if j==0:
+            plt.ylabel(r'$(\widehat{iOC}-iOC_{true})/iOC_{true}$')
+    plt.title('$D$: {:.0f}'.format(D))
     
 prev_col_idx = col_idx + colspan
 
-#%% Plot std(D)
+#%% Plot std(iOC)
 prev_col_idx = col_idx+colspan
 prev_row_idx = -2
 col_idx = prev_col_idx + 1
@@ -292,22 +309,28 @@ for j, D_str in enumerate(D_strs):
     alpha = 1
     for jj, pred_str in enumerate(list(pred_dict.keys())):
         if pred_str == 'our_preds':
-            c = 'blue'
+            c = 'tab:blue'
             if D == 50:
                 plt.plot(iOCs,iOC_stds_ours[D_str],color=c,alpha=alpha,label='D={:.0f}$\mu$m$^2$/s ANN'.format(D))
             else:
                 plt.plot(iOCs,iOC_stds_ours[D_str],color=c,alpha=alpha)
+            for jk,iOC_str in enumerate(iOC_strs):
+                plt.plot(iOCs[jk],iOC_stds_ours[D_str][jk],marker=markers[iOC_str],markeredgecolor='black',color=c)
+                
         else:
-            c = 'red'
+            c = 'tab:red'
             if D == 50:
                 plt.plot(iOCs,1e4*iOC_stds_barbora[D_str],color=c,alpha=alpha,label='D={:.0f}$\mu$m$^2$/s Barbora'.format(D))
             else:
                 plt.plot(iOCs,1e4*iOC_stds_barbora[D_str],color=c,alpha=alpha)
+            for jk,iOC_str in enumerate(iOC_strs):
+                plt.plot(iOCs[jk],1e4*iOC_stds_barbora[D_str][jk],marker=markers[iOC_str],markeredgecolor='black',color=c)
          
         if j == len(D_strs)-1:
             plt.xlabel(r'iOC (1e-4$\mu$m)')
-        #plt.ylabel(r'std(iOC) (1e-4$\mu$m)')
-    plt.title('D: {:.0f}'.format(D),fontweight='bold')
+        if j == 0:
+            plt.ylabel(r'std(iOC) (1e-4$\mu$m)')
+    plt.title('$D$: {:.0f}'.format(D))
 
 plt.tight_layout()
 

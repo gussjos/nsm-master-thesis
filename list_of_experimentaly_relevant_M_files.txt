@@ -1,3 +1,9 @@
+# channel_one
+ferritin/2020-10-13-ferritin/ferritin/channel_17_30x85
+BSA/2020-12-16-BSA/BSA-conc7/channel_17_30x85
+BSA/2020-12-16-BSA/BSA-conc3/channel_17_30x85
+
+# channel_two
 thyroglobulin/2020-04-20-thyroglobulin/channel_50x70_3/
 ferritin/2020-02-28/channel_50x70_3/
 ferritin/2020-02-28/channel_50x70_7/
@@ -6,6 +12,3 @@ DNA-1kbp/2020-05-20-dna-1kbp/channel_50x70_3/
 DNA-400bp/2020-05-27/channel_50x70_7/
 DNA-200bp/2020-06-04/channel_50x70_3/
 
-ferritin\2020-10-13-ferritin\ferritin\channel_17_30x85
-BSA\2020-12-16-BSA\BSA-conc7\channel_17_30x85
-BSA\2020-12-16-BSA\BSA-conc3\channel_17_30x85

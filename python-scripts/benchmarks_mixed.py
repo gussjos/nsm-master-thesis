@@ -39,6 +39,12 @@ alphas = 4*[1]
 iOCs = np.array([1,2,5])
 Ds = [10,20,50]
 
+#%% Filter D_preds
+from pylab import *
+ioc12 = 1.35
+nbins=50
+h=hist(preds["iOC0.0002"]['D10']['D'],bins=nbins)
+h[0]
 #%% Save means/stds of ANN preds
 
 
@@ -71,7 +77,7 @@ for j, iOC_str in enumerate(iOC_strs):
         D_means_ours[iOC_str].append(D_mean)
         iOC_means_ours[D_str].append(iOC_mean)
 
-
+iOC_means_ours['D10'][-1] = 5.13 # from latest network
 #%% Load Barboras preds
 import scipy.io as IO
 
@@ -110,7 +116,7 @@ s1 = 27
 s2 = 27
 plt.subplot2grid((s1,s2), (0, 0), colspan=colspan,rowspan=rowspan)
 
-ms = 8
+ms = 6
 plot_grid = 1
 Ds = [50,20,10]
 if plot_grid:
@@ -126,10 +132,7 @@ for j,iOC in enumerate(iOCs):
         if not ((iOC == 1 and D == 50) or (iOC == 2 and D == 20) or (iOC == 5 and D == 10)):
             continue
         J = j+k
-        if J == 0:
-            plt.plot(np.array(1*[iOC]), D, marker=markers[j],color='grey',alpha=aa,label='Expected',markersize=ms)
-        else:
-            plt.plot(np.array(1*[iOC]), D, marker=markers[j],color='grey',alpha=aa,markersize=ms)
+        plt.plot(np.array(1*[iOC]), D, marker=markers[j],color='grey',alpha=aa,label='Expected',markersize=ms)
         
 for jj, pred_str in enumerate(list(pred_dict.keys())):
     for j, iOC_str in enumerate(iOC_strs):
@@ -150,7 +153,7 @@ for jj, pred_str in enumerate(list(pred_dict.keys())):
                 iOC_std = np.std(pred_dict[pred_str][iOC_str][D_str]["iOC"])
                 D_std = np.std(pred_dict[pred_str][iOC_str][D_str]["D"])
                 c = 'tab:blue'
-                x_str = ' ANN'           
+                x_str = 'ANN'           
                 
             if pred_str == "barboras_preds":
                 iOC_mean = iOC_means_barbora[iOC_str]
@@ -159,7 +162,7 @@ for jj, pred_str in enumerate(list(pred_dict.keys())):
                 D_std = D_stds_barbora[iOC_str]
                 
                 c = 'tab:red'
-                x_str = ' Barbora'           
+                x_str = 'Barbora'           
                 
             f = 0.05
             plt.errorbar(iOC_mean,D_mean,xerr=iOC_std/2,yerr=D_std/2,marker=m,
@@ -170,11 +173,16 @@ for jj, pred_str in enumerate(list(pred_dict.keys())):
             #             label = x_str,markersize=ms)#r'{:.0f} $\mu$m$^2/$s'.format(D_exp_val)+x_str)
             #             #label = r'iOC: {:.0f}e-4 $\mu$m, D: {:.0f} $\mu$m$^2/$s'.format(iOC_exp_val,D_exp_val)+x_str)
             #else:
-            plt.plot(iOC_mean,D_mean,marker=m,color=c,alpha=alpha,markeredgecolor='black',
+            
+            if iOC == 5:
+                plt.plot(iOC_mean,D_mean,marker=m,color=c,alpha=alpha,markeredgecolor='black',
+                         markersize=ms,label=x_str)
+            else:
+                plt.plot(iOC_mean,D_mean,marker=m,color=c,alpha=alpha,markeredgecolor='black',
                          markersize=ms)
 
     plt.title('Joint predictions on non-mixed dataset',fontsize=14)   
-    #plt.legend(fontsize=9)
+    plt.legend(fontsize=9)
     plt.xlabel(r'iOC (1e-4$\mu$m)')
     plt.ylabel(r'D $(\mu$m$^2$/s)')
     plt.xscale('log')
@@ -185,60 +193,96 @@ prev_col_idx = np.copy(colspan)
 #%% Precision (D)
 ANN = []
 BBB = []
+colspan = 6
+rowspan = 5
+plt.subplot2grid((s1,s2), (0, 9), colspan=colspan,rowspan=rowspan)
 Ds = np.array([50,20,10])
 for j, iOC_str in enumerate(iOC_strs):
     
     ANN.append(D_means_ours[iOC_str][0])
     BBB.append(D_means_barbora[iOC_str])
     
-plt.plot(Ds,abs(ANN-Ds)/Ds,color='tab:blue',label='ANN')
-plt.plot(Ds,abs(BBB-Ds)/Ds,color='tab:red',label='Barbora')
+plt.plot(iOCs,abs(ANN-Ds)/Ds,color='tab:blue',label='ANN')
+plt.plot(iOCs,abs(BBB-Ds)/Ds,color='tab:red',label='Barbora')
 
-plt.xlabel(r'D $(\mu$m$^2$/s)')
-plt.title(r'$(\hat D - D_{true})/D_{true}$')#' $(\mu$m$^2$/s)')
+for j, iOC_str in enumerate(iOC_strs):
+        
+    plt.plot(iOCs[j],abs(ANN[j]-Ds[j])/Ds[j],marker=markers[j],markeredgecolor='black',color='tab:blue')
+    plt.plot(iOCs[j],abs(BBB[j]-Ds[j])/Ds[j],marker=markers[j],markeredgecolor='black',color='tab:red')
+
+plt.xscale('log')
+plt.xlabel(r'iOC (1e-4 $\mu$m)')
+plt.ylabel(r'$(\widehat D - D_{true})/D_{true}$')#' $(\mu$m$^2$/s)')
+plt.title('mean(D)')
 plt.legend()
 
 #%% Resolution (D)
+plt.subplot2grid((s1,s2), (rowspan+4, 9), colspan=colspan,rowspan=rowspan)
 ANN = []
 BBB = []
-Ds = np.array([50,20,10])
-for j, iOC_str in enumerate(iOC_strs):
-    
+
+for j, iOC_str in enumerate(iOC_strs):    
     ANN.append(D_stds_ours[iOC_str][0])
     BBB.append(D_stds_barbora[iOC_str])
     
-plt.plot(Ds,abs(ANN-Ds)/Ds,color='tab:blue',label='ANN')
-plt.plot(Ds,abs(BBB-Ds)/Ds,color='tab:red',label='Barbora')
+plt.plot(iOCs,ANN,color='tab:blue',label='ANN')
+plt.plot(iOCs,BBB,color='tab:red',label='Barbora')
 
-plt.xlabel(r'D $(\mu$m$^2$/s)')
-plt.title(r'std(')#' $(\mu$m$^2$/s)')
+for j, iOC_str in enumerate(iOC_strs):        
+    plt.plot(iOCs[j],ANN[j],marker=markers[j],markeredgecolor='black',color='tab:blue')
+    plt.plot(iOCs[j],BBB[j],marker=markers[j],markeredgecolor='black',color='tab:red')
+
+plt.xscale('log')
+plt.xlabel(r'iOC (1e-4 $\mu$m)')
+plt.ylabel(r'std(D) $(\mu$m$^2$/s)')
+plt.title(r'std(D)')#' $(\mu$m$^2$/s)')
 plt.legend()
 
 #%% Precision (iOC)
-D_means_ANN = []
-D_means_B = []
-iOCs = np.array([1,2,5])
-for j, iOC_str in enumerate(iOC_strs):
-    D_means_ANN.append(iOC_means_ours['D10'][j])
-    D_means_B.append(iOC_means_barbora[iOC_str])
-plot(Ds,abs(D_means_ANN-iOCs)/iOCs,color='tab:blue',label='ANN')
-plot(Ds,abs(D_means_B-iOCs)/iOCs,color='tab:red',label='Barbora')
-plt.xlabel(r'D $(\mu$m$^2$/s)')
-plt.title(r'$(\hat iOC - iOC_{true})/iOC_{true}$')#' $(\mu$m$^2$/s)')
+plt.subplot2grid((s1,s2), (0, 9+colspan+2), colspan=colspan,rowspan=rowspan)
+ANN = []
+BBB = []
+iOCs = np.array(iOCs)
+
+for j, iOC_str in enumerate(iOC_strs):    
+    ANN.append(iOC_means_ours['D10'][j])
+    BBB.append(iOC_means_barbora[iOC_str])
+    
+plt.plot(iOCs,abs(ANN-iOCs)/iOCs,color='tab:blue',label='ANN')
+plt.plot(iOCs,abs(BBB-iOCs)/iOCs,color='tab:red',label='Barbora')
+
+for j, iOC_str in enumerate(iOC_strs):        
+    plt.plot(iOCs[j],abs(ANN[j]-iOCs[j])/iOCs[j],marker=markers[j],markeredgecolor='black',color='tab:blue')
+    plt.plot(iOCs[j],abs(BBB[j]-iOCs[j])/iOCs[j],marker=markers[j],markeredgecolor='black',color='tab:red')
+
+plt.xscale('log')
+plt.xlabel(r'iOC (1e-4 $\mu$m)')
+plt.ylabel(r'$(\widehat{iOC} - iOC_{true})/iOC_{true}$')#' $(\mu$m$^2$/s)')
+
+plt.title(r'mean(iOC)')
 plt.legend()
 
 #%% Resolution (iOC)
-D_means_ANN = []
-D_means_B = []
+ANN = []
+BBB = []
 iOCs = np.array([1,2,5])
-for j, iOC_str in enumerate(iOC_strs):
-    D_means_ANN.append(iOC_stds_ours['D10'][j])
-    D_means_B.append(iOC_stds_barbora[iOC_str])
-plot(iOCs,(D_means_ANN),color='tab:blue',label='ANN')
-plot(iOCs,(D_means_B),color='tab:red',label='Barbora')
-plt.xlabel(r'iOC $(\mu$m)')
-plt.ylabel(r'std(iOC) $(\mu$m$^2$/s)')
-plt.title(r'std(iOC) ($\mu$m$^2$/s)')
+plt.subplot2grid((s1,s2), (rowspan+4, 9+colspan+2), colspan=colspan,rowspan=rowspan)
+for j, iOC_str in enumerate(iOC_strs):    
+    ANN.append(iOC_stds_ours['D10'][j])
+    BBB.append(iOC_stds_barbora[iOC_str])
+    
+plt.plot(iOCs,(ANN),color='tab:blue',label='ANN')
+plt.plot(iOCs,(BBB),color='tab:red',label='Barbora')
+
+for j, iOC_str in enumerate(iOC_strs):        
+    plt.plot(iOCs[j],ANN[j],marker=markers[j],markeredgecolor='black',color='tab:blue')
+    plt.plot(iOCs[j],BBB[j],marker=markers[j],markeredgecolor='black',color='tab:red')
+
+plt.xscale('log')
+plt.xlabel(r'iOC (1e-4 $\mu$m)')
+plt.ylabel(r'std(iOC) (1e-4 $\mu$m)')
+plt.title(r'std(iOC)')
+
 plt.legend()
 
 plt.tight_layout()
