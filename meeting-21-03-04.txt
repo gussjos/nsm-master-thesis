@@ -1,0 +1,4 @@
+Questions:
+* Do we have all the measurements used?
+* How do we convert to radius and molecular weight? (We need to know some parameters like temperature)
+
